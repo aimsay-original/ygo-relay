@@ -1,12 +1,28 @@
 // YGO Duel WebSocket Relay Server
 // Lightweight relay for game data — bypasses all NAT/firewall issues
 const { WebSocketServer } = require('ws');
+const http = require('http');
 
 const PORT = process.env.PORT || 10000;
 const rooms = new Map(); // roomCode → { host: ws, guest: ws }
 
-const wss = new WebSocketServer({ port: PORT });
-console.log(`YGO Relay listening on port ${PORT}`);
+// HTTP server for health checks (Render needs this)
+const httpServer = http.createServer((req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+  if (req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok', rooms: rooms.size, uptime: process.uptime() }));
+  } else {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('YGO Relay Server');
+  }
+});
+
+const wss = new WebSocketServer({ server: httpServer });
+httpServer.listen(PORT, () => {
+  console.log(`YGO Relay listening on port ${PORT}`);
+});
 
 wss.on('connection', (ws) => {
   let role = null;  // 'host' or 'guest'
