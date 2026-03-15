@@ -1,13 +1,13 @@
 {
   "name": "ygo-relay",
-  "version": "2.0.0",
-  "description": "PeerJS signaling server for YGO Duel",
+  "version": "3.0.0",
+  "description": "PeerJS-compatible signaling server for YGO Duel",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "peer": "^1.0.2"
+    "ws": "^8.16.0"
   },
   "engines": {
     "node": ">=18"
